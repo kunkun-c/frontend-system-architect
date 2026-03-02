@@ -4,6 +4,7 @@
   <img src="https://img.shields.io/badge/rendering_strategies-25-purple?style=for-the-badge" alt="25 Rendering Strategies">
   <img src="https://img.shields.io/badge/python-3.x-yellow?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.x">
   <a href="https://github.com/kunkun-c/frontend-system-architect/blob/main/LICENSE"><img src="https://img.shields.io/github/license/kunkun-c/frontend-system-architect?style=for-the-badge&color=green" alt="License"></a>
+  <a href="https://www.paypal.com/paypalme/CuongLyThai"><img src="https://img.shields.io/badge/Donate-PayPal-blue?style=for-the-badge&logo=paypal" alt="Donate"></a>
 </p>
 
 <p align="center">
@@ -26,6 +27,20 @@
   <a href="#supported-frameworks">Frameworks</a> •
   <a href="#architecture">Architecture</a>
 </p>
+
+---
+
+---
+
+## 🤝 Support This Project
+
+If you find this CLI helpful for your frontend architecture work, consider supporting its development:
+
+<a href="https://www.paypal.com/paypalme/CuongLyThai">
+  <img src="https://img.shields.io/badge/Donate-PayPal-blue?style=for-the-badge&logo=paypal" alt="Donate via PayPal">
+</a>
+
+Your support helps maintain and improve the CLI with new architecture patterns and features.
 
 ---
 
