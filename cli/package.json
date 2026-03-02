@@ -1,6 +1,6 @@
 {
   "name": "fe-architect-cli",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "CLI to install Frontend System Architect skill for AI coding assistants",
   "type": "module",
   "bin": {

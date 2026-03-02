@@ -5,7 +5,32 @@ import type { AIType } from '../types/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 // After build: dist/utils/template.js -> ../../assets = cli/assets
-const ASSETS_DIR = join(__dirname, '..', '..', 'assets');
+let ASSETS_DIR = join(__dirname, '..', '..', 'assets');
+
+// Fallback for npm global install scenarios
+import { existsSync } from 'fs';
+if (!existsSync(ASSETS_DIR)) {
+  // Try alternative paths for different install scenarios
+  const possiblePaths = [
+    join(__dirname, '..', 'assets'), // dist/assets
+    join(__dirname, 'assets'), // dist/utils/assets
+    join(process.cwd(), 'node_modules', 'fe-architect-cli', 'assets'), // local node_modules
+    join(__dirname, '..', '..', 'node_modules', 'fe-architect-cli', 'assets'), // relative node_modules
+  ];
+  
+  for (const path of possiblePaths) {
+    if (existsSync(path)) {
+      ASSETS_DIR = path;
+      console.log(`Found assets at: ${ASSETS_DIR}`);
+      break;
+    }
+  }
+  
+  if (!existsSync(ASSETS_DIR)) {
+    console.error(`Assets not found. Searched paths:`, possiblePaths);
+    throw new Error(`Assets directory not found. Please reinstall the CLI: npm install -g fe-architect-cli@latest`);
+  }
+}
 
 export interface PlatformConfig {
   platform: string;
