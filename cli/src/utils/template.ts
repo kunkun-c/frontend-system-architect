@@ -1,99 +1,221 @@
+import { readFile, mkdir, writeFile, cp, access } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { mkdir, writeFile, cp } from 'node:fs/promises';
 import type { AIType } from '../types/index.js';
-import { PLATFORM_CONFIG } from '../types/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+// After build: dist/utils/template.js -> ../../assets = cli/assets
 const ASSETS_DIR = join(__dirname, '..', '..', 'assets');
 
-const SKILL_TEMPLATE = `---
-name: frontend-system-architect
-description: "Frontend system architecture intelligence. Rendering decisions (SSG, SSR, CSR, ISR, Hybrid), performance optimization (Core Web Vitals), state management patterns, caching strategies, monitoring setup. Actions: analyze, audit, design, recommend, optimize, refactor, review architecture. Projects: Next.js, Nuxt, SvelteKit, Astro, React, Vue, Angular, Remix. Topics: rendering strategy, page classification, bundle optimization, CDN, lazy loading, code splitting, state management, SEO, performance, scalability. Metrics: LCP, FID, INP, CLS, TTFB. Patterns: Clean Architecture, Atomic Design, Feature-based structure."
----
+export interface PlatformConfig {
+  platform: string;
+  displayName: string;
+  installType: 'full' | 'reference';
+  folderStructure: {
+    root: string;
+    skillPath: string;
+    filename: string;
+  };
+  scriptPath: string;
+  frontmatter: Record<string, string> | null;
+  sections: {
+    quickReference: boolean;
+  };
+  title: string;
+  description: string;
+  skillOrWorkflow: string;
+}
 
-# Frontend System Architect - Architecture Intelligence
+// Map AIType to platform config file name
+const AI_TO_PLATFORM: Record<string, string> = {
+  claude: 'claude',
+  cursor: 'cursor',
+  windsurf: 'windsurf',
+  antigravity: 'antigravity',
+  copilot: 'copilot',
+  kiro: 'kiro',
+  opencode: 'opencode',
+  roocode: 'roocode',
+  codex: 'codex',
+  qoder: 'qoder',
+  gemini: 'gemini',
+  trae: 'trae',
+  continue: 'continue',
+  codebuddy: 'codebuddy',
+  droid: 'droid',
+};
 
-This skill provides architecture intelligence for frontend systems. It contains rules for rendering decisions, performance optimization, state management, caching strategies, and tech stack selection.
+async function exists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
-## Quick Reference
+/**
+ * Load platform configuration from JSON file
+ */
+export async function loadPlatformConfig(aiType: string): Promise<PlatformConfig> {
+  const platformName = AI_TO_PLATFORM[aiType];
+  if (!platformName) {
+    throw new Error(`Unknown AI type: ${aiType}`);
+  }
 
-### Decision Framework (Answer in Order)
+  const configPath = join(ASSETS_DIR, 'templates', 'platforms', `${platformName}.json`);
+  const content = await readFile(configPath, 'utf-8');
+  return JSON.parse(content) as PlatformConfig;
+}
 
-1. **Data Freshness**: Real-time? → SSR/CSR | Periodic? → ISR | Static? → SSG
-2. **SEO**: Critical? → SSG/SSR/ISR | Low? → CSR OK
-3. **Server Budget**: Low? → SSG/ISR | High? → SSR OK
-4. **UX**: SPA-like? → CSR/Hybrid | Standard? → Any
+/**
+ * Load all available platform configs
+ */
+export async function loadAllPlatformConfigs(): Promise<Map<string, PlatformConfig>> {
+  const configs = new Map<string, PlatformConfig>();
 
-### Page Classification
+  for (const [aiType] of Object.entries(AI_TO_PLATFORM)) {
+    try {
+      const config = await loadPlatformConfig(aiType);
+      configs.set(aiType, config);
+    } catch {
+      // Skip if config doesn't exist
+    }
+  }
 
-| Page Type | Rendering |
-|-----------|-----------|
-| Landing/Blog | SSG |
-| Product List | ISR |
-| Product Detail | SSR/ISR |
-| Cart/Checkout | CSR |
-| Dashboard | CSR |
-| Admin | CSR |
+  return configs;
+}
 
-### Core Web Vitals
+/**
+ * Load a template file
+ */
+async function loadTemplate(templateName: string): Promise<string> {
+  const templatePath = join(ASSETS_DIR, 'templates', templateName);
+  return readFile(templatePath, 'utf-8');
+}
 
-| Metric | Good | Poor |
-|--------|------|------|
-| LCP | ≤2.5s | >4.0s |
-| INP | ≤200ms | >500ms |
-| CLS | ≤0.1 | >0.25 |
+/**
+ * Render frontmatter section
+ */
+function renderFrontmatter(frontmatter: Record<string, string> | null): string {
+  if (!frontmatter) return '';
 
-## How to Use
+  const lines = ['---'];
+  for (const [key, value] of Object.entries(frontmatter)) {
+    // Quote values that contain special characters
+    if (value.includes(':') || value.includes('"') || value.includes('\n')) {
+      lines.push(`${key}: "${value.replace(/"/g, '\\"')}"`);
+    } else {
+      lines.push(`${key}: ${value}`);
+    }
+  }
+  lines.push('---', '');
+  return lines.join('\n');
+}
 
-1. Search database: \`python3 data/../scripts/search.py "query"\`
-2. Apply decision framework to each page
-3. Generate architecture report
-4. Validate against anti-patterns
-`;
+/**
+ * Render skill file content from template
+ */
+export async function renderSkillFile(config: PlatformConfig): Promise<string> {
+  // Load base template
+  let content = await loadTemplate('base/skill-content.md');
 
+  // Load quick reference if needed
+  let quickReferenceContent = '';
+  if (config.sections.quickReference) {
+    quickReferenceContent = await loadTemplate('base/quick-reference.md');
+  }
+
+  // Build the final content
+  const frontmatter = renderFrontmatter(config.frontmatter);
+
+  // Replace placeholders
+  const quickRefWithNewline = quickReferenceContent ? '\n' + quickReferenceContent : '';
+
+  content = content
+    .replace(/\{\{TITLE\}\}/g, config.title)
+    .replace(/\{\{DESCRIPTION\}\}/g, config.description)
+    .replace(/\{\{SCRIPT_PATH\}\}/g, config.scriptPath)
+    .replace(/\{\{SKILL_OR_WORKFLOW\}\}/g, config.skillOrWorkflow)
+    .replace(/\{\{QUICK_REFERENCE\}\}/g, quickRefWithNewline);
+
+  return frontmatter + content;
+}
+
+/**
+ * Copy data and scripts to target directory
+ */
+async function copyDataAndScripts(targetSkillDir: string): Promise<void> {
+  const dataSource = join(ASSETS_DIR, 'data');
+  const scriptsSource = join(ASSETS_DIR, 'scripts');
+
+  const dataTarget = join(targetSkillDir, 'data');
+  const scriptsTarget = join(targetSkillDir, 'scripts');
+
+  // Copy data
+  if (await exists(dataSource)) {
+    await cp(dataSource, dataTarget, { recursive: true, force: true });
+  }
+
+  // Copy scripts
+  if (await exists(scriptsSource)) {
+    await cp(scriptsSource, scriptsTarget, { recursive: true, force: true });
+  }
+}
+
+/**
+ * Generate platform files for a specific AI type
+ */
 export async function generatePlatformFiles(
   targetDir: string,
   aiType: AIType
 ): Promise<string[]> {
-  const config = PLATFORM_CONFIG[aiType];
-  if (!config) {
-    throw new Error(`Unknown AI type: ${aiType}`);
-  }
+  const config = await loadPlatformConfig(aiType);
+  const createdFolders: string[] = [];
 
-  const skillDir = join(targetDir, config.folder);
-  const copiedFolders: string[] = [];
+  // Determine full skill directory path
+  const skillDir = join(
+    targetDir,
+    config.folderStructure.root,
+    config.folderStructure.skillPath
+  );
 
-  // Create skill directory
+  // Create directory structure
   await mkdir(skillDir, { recursive: true });
 
-  // Write SKILL.md
-  await writeFile(join(skillDir, 'SKILL.md'), SKILL_TEMPLATE);
-  copiedFolders.push(config.folder);
+  // Render and write skill file
+  const skillContent = await renderSkillFile(config);
+  const skillFilePath = join(skillDir, config.folderStructure.filename);
+  await writeFile(skillFilePath, skillContent, 'utf-8');
+  createdFolders.push(config.folderStructure.root);
 
-  // Copy data and scripts from assets
-  try {
-    await cp(join(ASSETS_DIR, 'data'), join(skillDir, 'data'), { recursive: true });
-    await cp(join(ASSETS_DIR, 'scripts'), join(skillDir, 'scripts'), { recursive: true });
-  } catch {
-    // Assets may not exist in dev mode
-    console.log('Note: Assets not found, skipping data/scripts copy');
-  }
+  // Copy data and scripts into the skill directory
+  await copyDataAndScripts(skillDir);
 
-  return copiedFolders;
+  return createdFolders;
 }
 
-export async function generateAllPlatformFiles(
-  targetDir: string
-): Promise<string[]> {
-  const allFolders: string[] = [];
+/**
+ * Generate files for all AI types
+ */
+export async function generateAllPlatformFiles(targetDir: string): Promise<string[]> {
+  const allFolders = new Set<string>();
 
-  for (const [aiType] of Object.entries(PLATFORM_CONFIG)) {
-    if (aiType === 'all') continue;
-    
-    const folders = await generatePlatformFiles(targetDir, aiType as AIType);
-    allFolders.push(...folders);
+  for (const aiType of Object.keys(AI_TO_PLATFORM)) {
+    try {
+      const folders = await generatePlatformFiles(targetDir, aiType as AIType);
+      folders.forEach(f => allFolders.add(f));
+    } catch {
+      // Skip if generation fails for a platform
+    }
   }
 
-  return allFolders;
+  return Array.from(allFolders);
+}
+
+/**
+ * Get list of supported AI types
+ */
+export function getSupportedAITypes(): string[] {
+  return Object.keys(AI_TO_PLATFORM);
 }

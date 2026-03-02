@@ -5,8 +5,8 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { initCommand } from './commands/init.js';
-import { versionsCommand } from './commands/versions.js';
 import { updateCommand } from './commands/update.js';
+import { versionsCommand } from './commands/versions.js';
 import type { AIType } from './types/index.js';
 import { AI_TYPES } from './types/index.js';
 

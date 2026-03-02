@@ -31,6 +31,7 @@
 
 ## Features
 
+- **🏗️ Architecture Intelligence** - Professional frontend system architecture guidance
 - **25 Rendering Strategies** - SSG, SSR, CSR, ISR, Hybrid with decision framework
 - **25 Page Classifications** - Automatic rendering recommendation by page type
 - **20 Performance Metrics** - Core Web Vitals (LCP, INP, CLS, TTFB) optimization rules
@@ -40,6 +41,8 @@
 - **25 Monitoring Patterns** - Sentry, Datadog, Vercel Analytics, Lighthouse CI
 - **30 Anti-Patterns** - Common mistakes with detection and fixes
 - **6 Framework-Specific Guides** - Next.js, React, Vue, SvelteKit, Astro, Angular (25 patterns each)
+- **🔍 Architecture Search** - BM25-powered search across 200+ architecture patterns
+- **📋 Template System** - Professional skill generation with platform-specific configs
 
 ## Installation
 
@@ -74,17 +77,15 @@ fea init --ai all         # All assistants
 ### Other CLI Commands
 
 ```bash
-fea versions              # List available versions
-fea update                # Update to latest version
-fea init --offline        # Skip GitHub download, use bundled assets
-fea search "e-commerce"   # Search architecture database
-fea search "LCP" --domain performance  # Domain-specific search
+fea init --ai <platform>              # Install skill (see above)
+fea versions                          # List available versions
+fea update --ai <platform>            # Update to latest version
 ```
 
 ### Using Claude Marketplace (Claude Code)
 
 ```bash
-/plugin marketplace add lenhatquang2000/frontend-system-architect
+/plugin marketplace add kunkun-c/frontend-system-architect
 /plugin install fe-architect@frontend-system-architect
 ```
 
@@ -134,21 +135,36 @@ Recommend state management for my real-time dashboard
 ### Example Prompts
 
 ```
+# Architecture analysis
 Analyze my Next.js app architecture and recommend improvements
 
+# Rendering strategy
 What rendering strategy for an e-commerce site with 10K products?
 
+# Performance optimization
 Design a caching strategy for a real-time dashboard
-
 Audit my React SPA performance and suggest optimizations
 
+# Migration guidance
 Help me migrate from CSR to SSR for better SEO
 
+# Tech stack selection
 Recommend tech stack for a SaaS application
 
+# State management
 Design state management for a collaborative editing app
 
+# PWA architecture
 What's the best architecture for a PWA with offline support?
+
+# System design
+Design frontend architecture for a large-scale e-commerce platform
+
+# Performance audit
+Optimize Core Web Vitals for my React application
+
+# Architecture patterns
+Recommend state management patterns for a real-time dashboard
 ```
 
 ## How It Works

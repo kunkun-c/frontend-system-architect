@@ -1,0 +1,21 @@
+{
+  "platform": "cursor",
+  "displayName": "Cursor",
+  "installType": "full",
+  "folderStructure": {
+    "root": ".cursor",
+    "skillPath": "skills/frontend-system-architect",
+    "filename": "SKILL.md"
+  },
+  "scriptPath": "skills/frontend-system-architect/scripts/search.py",
+  "frontmatter": {
+    "name": "frontend-system-architect",
+    "description": "Frontend system architecture intelligence. Rendering decisions (SSG, SSR, CSR, ISR, Hybrid), performance optimization (Core Web Vitals), state management patterns, caching strategies, monitoring setup."
+  },
+  "sections": {
+    "quickReference": true
+  },
+  "title": "Frontend System Architect - Architecture Intelligence",
+  "description": "Comprehensive architecture guide for Frontend systems. Contains rendering strategy decisions, performance optimization rules, state management patterns, caching strategies, and monitoring guidelines.",
+  "skillOrWorkflow": "skill"
+}

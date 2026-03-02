@@ -1,0 +1,18 @@
+{
+  "platform": "copilot",
+  "displayName": "GitHub Copilot",
+  "installType": "full",
+  "folderStructure": {
+    "root": ".github",
+    "skillPath": "copilot/skills/frontend-system-architect",
+    "filename": "SKILL.md"
+  },
+  "scriptPath": "copilot/skills/frontend-system-architect/scripts/search.py",
+  "frontmatter": null,
+  "sections": {
+    "quickReference": true
+  },
+  "title": "Frontend System Architect - Architecture Intelligence",
+  "description": "Comprehensive architecture guide for Frontend systems. Contains rendering strategy decisions, performance optimization rules, state management patterns, caching strategies, and monitoring guidelines.",
+  "skillOrWorkflow": "skill"
+}
